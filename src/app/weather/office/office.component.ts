@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { WeatherService } from '../shared/weather.service';
 import { Point } from '../shared/point.model';
-import { concatMap, of } from 'rxjs';
+import { catchError, concatMap, of } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-office',
@@ -16,7 +17,7 @@ export class OfficeComponent {
     { id: 'TOP', name: 'Kansas Forecast' },
   ];
   point: Point | null = null;
-  constructor(private weather: WeatherService) {}
+  constructor(private weather: WeatherService, private router: Router) {}
   selectOffice(id: string) {
     this.weather
       .getOffice(id)
@@ -45,10 +46,20 @@ export class OfficeComponent {
           const gridId = res.properties.gridId;
           const coor = `${res.properties.gridX},${res.properties.gridY}`;
           return this.weather.getForecast(gridId, coor);
+        }),
+        catchError(() => {
+          return of('An error ocurred with some crazy coordinates. Try again!');
         })
       )
       .subscribe((res) => {
-        console.log(res);
+        if (typeof res !== 'string') {
+          this.weather.forecast.set(res);
+          this.weather.error.set('');
+        } else {
+          this.weather.error.set(res);
+          this.weather.forecast.set(null);
+        }
+        this.router.navigate(['/view']);
       });
   }
 }

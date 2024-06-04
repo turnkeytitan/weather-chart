@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, WritableSignal, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Point } from './point.model';
 import { take } from 'rxjs';
@@ -12,6 +12,8 @@ import { Forecast } from './forecast.model';
 })
 export class WeatherService {
   url = environment.WEATHER_API;
+  forecast: WritableSignal<Forecast | null> = signal(null);
+  error = signal('');
   constructor(private http: HttpClient) {}
 
   getOffice(office: string) {
