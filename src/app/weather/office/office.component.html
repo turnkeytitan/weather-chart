@@ -1,0 +1,9 @@
+<ul>
+  @for (office of offices; track office.id) {
+  <li [id]="office.id" (click)="selectOffice(office.id)">
+    {{ office.name }} ( {{ office.id }} )
+  </li>
+  } @empty {
+  <li>There are no items.</li>
+  }
+</ul>
